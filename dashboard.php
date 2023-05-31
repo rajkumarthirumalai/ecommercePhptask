@@ -35,10 +35,8 @@ $breadcrumbHtml .= '</ol></nav>';
     <title>Dashboard</title>
     <!-- CSS and other head elements -->
     <link href="https://cdn.jsdelivr.net/npm/mdb-ui-kit@3.11.0/css/mdb.min.css" rel="stylesheet" />
+    <link href="./dist/treeselectjs.css" rel="stylesheet" />
     <style>
-        @import './dist/treeselectjs.css';
-
-
         @media screen and (max-width: 850px) {
             .section__select {
                 width: 100%;
@@ -162,7 +160,7 @@ $breadcrumbHtml .= '</ol></nav>';
                 {
                     global $conn;
 
-                    $selectQuery = "SELECT id, image, name, price, sku FROM products";
+                    $selectQuery = "SELECT id, image_path, name, price, sku FROM products";
                     if (!empty($sortCriteria)) {
                         $allowedCriteria = array("name", "price", "sku");
                         if (in_array($sortCriteria, $allowedCriteria)) {
@@ -181,7 +179,7 @@ $breadcrumbHtml .= '</ol></nav>';
                 // Loop through the products and display rows in the table
                 while ($row = $result->fetch_assoc()) {
                     $id = $row['id'];
-                    $image = $row['image'];
+                    $image = $row['image_path'];
                     $name = $row['name'];
                     $price = $row['price'];
                     $sku = $row['sku'];
@@ -197,6 +195,7 @@ $breadcrumbHtml .= '</ol></nav>';
                             <?php echo $price; ?>
                         </td>
                         <td>
+                            <!-- <?php echo $image; ?> -->
                             <img src="<?php echo $image; ?>" alt="Product Image" style="width: 70px; height: 70px;">
                         </td>
                         <td>
@@ -229,7 +228,7 @@ $breadcrumbHtml .= '</ol></nav>';
                     </div>
                     <div class="modal-body">
                         <!-- Add your form elements for adding a new product -->
-                        <form method="POST" action="add_product.php">
+                        <form method="POST" action="add_product.php" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="productImage" class="form-label">category</label>
                                 <div class="section__select treeselect-demo-default">
@@ -249,10 +248,22 @@ $breadcrumbHtml .= '</ol></nav>';
                                 <label for="productSku" class="form-label">SKU</label>
                                 <input type="text" class="form-control" id="productSku" name="productSku" required>
                             </div>
-                            <div class="mb-3">
+                            <!-- <div class="mb-3">
                                 <label for="productImage" class="form-label">Image URL</label>
                                 <input type="text" class="form-control" id="productImage" name="productImage" required>
+                            </div> -->
+                            <div class="mb-3">
+                                <label for="productImage" class="form-label">Image</label>
+                                <input type="file" class="form-control" id="productImage" name="productImage"
+                                    accept="image/*" onchange="previewImage(event, 'addImagePreview')" required>
+
+                                <img id="addImagePreview" src="#" alt="Image Preview"
+                                    style="display: none; width: 100px; height: 100px; margin-top: 10px;">
+
+
+
                             </div>
+
                             <button type="submit" class="btn btn-primary">Add</button>
                         </form>
                     </div>
@@ -270,7 +281,7 @@ $breadcrumbHtml .= '</ol></nav>';
                     </div>
                     <div class="modal-body">
                         <!-- Add your form elements for editing a product -->
-                        <form method="POST" action="update_product.php">
+                        <form method="POST" action="update_product.php" enctype="multipart/form-data">
                             <input type="hidden" id="editProductId" name="id">
                             <div class="mb-3">
                                 <label for="editProductName" class="form-label">Product Name</label>
@@ -287,12 +298,18 @@ $breadcrumbHtml .= '</ol></nav>';
                                 <input type="text" class="form-control" id="editProductSku" name="productSku" required>
                             </div>
                             <div class="mb-3">
-                                <label for="editProductImage" class="form-label">Image URL</label>
-                                <input type="text" class="form-control" id="editProductImage" name="productImage"
-                                    required>
+                                <label for="editProductImage" class="form-label">Image</label>
+                                <img id="editImagePreview" src="#" alt="Image Preview"
+                                    style="display: none; width: 100px; height: 100px; margin-top: 10px;">
+
+                                <input type="file" class="form-control" id="editProductImage" name="productImage"
+                                    accept="image/*" onchange="previewImage(event, 'editImagePreview')">
+
                             </div>
                             <button type="submit" class="btn btn-primary">Update</button>
                         </form>
+
+
                     </div>
                 </div>
             </div>
@@ -306,7 +323,6 @@ $breadcrumbHtml .= '</ol></nav>';
             var sortCriteria = select.value;
             window.location.href = "dashboard.php?sort=" + sortCriteria;
         }
-
         function editProduct(productId) {
             // Fetch the product details from the server and populate the edit product modal fields
             fetch("get_product.php?id=" + productId)
@@ -316,14 +332,42 @@ $breadcrumbHtml .= '</ol></nav>';
                     document.getElementById("editProductName").value = product.name;
                     document.getElementById("editProductPrice").value = product.price;
                     document.getElementById("editProductSku").value = product.sku;
-                    document.getElementById("editProductImage").value = product.image;
+
+                    // Set the src attribute of editImagePreview to the image path
+                    document.getElementById("editImagePreview").src = product.image_path;
+                    document.getElementById("editImagePreview").style.display = "block";
 
                     // Show the edit product modal
                     var modal = new mdb.Modal(document.getElementById("editProductModal"));
-                    modal.show()
-                })
+                    modal.show();
+                });
         }
+
+        function previewImage(event, previewId) {
+            console.log("preview is called");
+            var input = event.target;
+            var preview = document.getElementById(previewId);
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = "#";
+                preview.style.display = "none";
+            }
+        }
+
+
+
+
     </script>
+    <script src="./dist/treeselectjs.min.js"></script>
 </body>
 
 </html>
