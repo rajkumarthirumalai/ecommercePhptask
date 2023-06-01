@@ -27,9 +27,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (in_array($imageFileType, $allowedTypes)) {
             // Define the upload directory and file paths
             $uploadDirectory = 'images/';
-            $uploadFilePath = $uploadDirectory . uniqid() . '.' . $imageFileType;
+            $some = $uploadDirectory . uniqid();
+            $uploadFilePath =  $some. '.' . $imageFileType;
             $thumbnailDirectory = 'images/thumbnails/';
-            $thumbnailFilePath = $thumbnailDirectory . uniqid() . '_thumbnail.' . $imageFileType;
+            $thumbnailFilePath = $some. '_thumbnail.' . $imageFileType;
 
             // Move the uploaded file to the desired directories
             if (move_uploaded_file($imageTmpName, $uploadFilePath)) {

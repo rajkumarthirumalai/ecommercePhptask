@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-md-6 mt-4">
                 <h2>Sign Up</h2>
                 <form action="signup.php" method="POST">
                     <div class="mb-3">

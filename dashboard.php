@@ -7,27 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 // var_dump(isset($_SESSION['user_id']));
 ?>
-<?php
-// Dummy breadcrumb data
-$breadcrumbData = array("Home", "Category 1", "Category 2", "Category 3");
 
-// Generate Breadcrumb HTML
-$breadcrumbHtml = '<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">';
-
-foreach ($breadcrumbData as $index => $category) {
-    $breadcrumbHtml .= '<li class="breadcrumb-item';
-
-    // Add "active" class to the last breadcrumb item
-    if ($index === count($breadcrumbData) - 1) {
-        $breadcrumbHtml .= ' active';
-    }
-
-    $breadcrumbHtml .= '">' . $category . '</li>';
-}
-
-$breadcrumbHtml .= '</ol></nav>';
-?>
 <!DOCTYPE html>
 <html>
 
@@ -286,7 +266,7 @@ $breadcrumbHtml .= '</ol></nav>';
                     <div class="modal-body">
                         <!-- Add your form elements for editing a product -->
                         <form method="POST" action="update_product.php" enctype="multipart/form-data">
-                            <input type="hidden" id="editProductId" name="id">
+                            <input type="hidden" id="editProductId" name="productId">
                             <div class="mb-3">
                                 <label for="editProductName" class="form-label">Product Name</label>
                                 <input type="text" class="form-control" id="editProductName" name="productName"
@@ -328,11 +308,13 @@ $breadcrumbHtml .= '</ol></nav>';
             window.location.href = "dashboard.php?sort=" + sortCriteria;
         }
         function editProduct(productId) {
+            // Set the product ID value in the editProductModal form
+            document.getElementById("editProductId").value = productId;
+
             // Fetch the product details from the server and populate the edit product modal fields
             fetch("get_product.php?id=" + productId)
                 .then(response => response.json())
                 .then(product => {
-                    document.getElementById("editProductId").value = product.id;
                     document.getElementById("editProductName").value = product.name;
                     document.getElementById("editProductPrice").value = product.price;
                     document.getElementById("editProductSku").value = product.sku;
@@ -346,6 +328,7 @@ $breadcrumbHtml .= '</ol></nav>';
                     modal.show();
                 });
         }
+
         function ViewProduct(pid) {
             window.location.href = "product-details.php?id=" + pid;
         }

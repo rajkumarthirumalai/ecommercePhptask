@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
+            <div class="col-md-6 mt-4">
                 <h2>Login</h2>
                 <?php if (isset($error)) { ?>
                     <div class="alert alert-danger">

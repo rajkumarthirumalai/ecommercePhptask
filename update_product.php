@@ -28,36 +28,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (in_array($imageFileType, $allowedTypes)) {
             // Define the upload directory and file paths
             $uploadDirectory = 'images/';
-            $uploadFilePath = $uploadDirectory . uniqid() . '.' . $imageFileType;
+            $some = $uploadDirectory . uniqid();
+            $uploadFilePath =  $some. '.' . $imageFileType;
+            $thumbnailDirectory = 'images/thumbnails/';
+            $thumbnailFilePath = $some. '_thumbnail.' . $imageFileType;
 
-            // Move the uploaded file to the desired directory
+            // Move the uploaded file to the desired directories
             if (move_uploaded_file($imageTmpName, $uploadFilePath)) {
                 echo "Image uploaded successfully.\n";
 
-                // Prepare the update query with only the provided values
-                $updateQuery = "UPDATE products SET";
-                $updateParams = array();
-                if (!empty($productName)) {
-                    $updateParams[] = "name='$productName'";
-                }
-                if (!empty($productPrice)) {
-                    $updateParams[] = "price='$productPrice'";
-                }
-                if (!empty($productSku)) {
-                    $updateParams[] = "sku='$productSku'";
-                }
-                if (!empty($uploadFilePath)) {
-                    $updateParams[] = "image_path='$uploadFilePath'";
-                    $thumbnailFilePath = str_replace('images/', 'images/thumbnails/', $uploadFilePath);
-                    $updateParams[] = "thumbnail_path='$thumbnailFilePath'";
-                }
-                if (!empty($category)) {
-                    $updateParams[] = "category='$category'";
-                }
+                // Create a thumbnail of the uploaded image
+                $thumbnail = imagecreatetruecolor(100, 100);
+                $source = imagecreatefromstring(file_get_contents($uploadFilePath));
+                imagecopyresampled($thumbnail, $source, 0, 0, 0, 0, 100, 100, imagesx($source), imagesy($source));
 
-                if (!empty($updateParams)) {
-                    $updateQuery .= " " . implode(", ", $updateParams);
-                    $updateQuery .= " WHERE id='$id'";
+                // Save the thumbnail image
+                if (imagejpeg($thumbnail, $thumbnailFilePath)) {
+                    echo "Thumbnail image created and saved.\n";
+
+                    // Update the product in the database with the new uploaded file paths
+                    $updateQuery = "UPDATE products SET name='$productName', price='$productPrice', sku='$productSku', image_path='$uploadFilePath', thumbnail_path='$thumbnailFilePath', category='$category' WHERE id='$id'";
+                    var_dump ($updateQuery);
 
                     if ($conn->query($updateQuery)) {
                         echo "Product updated successfully.\n";
@@ -69,8 +60,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         echo "Failed to update product in the database: " . $conn->error;
                     }
                 } else {
-                    echo "No fields provided to update.\n";
+                    echo "Failed to create and save the thumbnail image.\n";
                 }
+
+                // Free up memory
+                imagedestroy($thumbnail);
+                imagedestroy($source);
             } else {
                 echo "Failed to move the uploaded image file to the desired directory.\n";
             }
@@ -78,41 +73,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             echo "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.\n";
         }
     } else {
-        // Prepare the update query with only the provided values
-        $updateQuery = "UPDATE products SET";
-        $updateParams = array();
-        if (!empty($productName)) {
-            $updateParams[] = "name='$productName'";
-        }
-        if (!empty($productPrice)) {
-            $updateParams[] = "price='$productPrice'";
-        }
-        if (!empty($productSku)) {
-            $updateParams[] = "sku='$productSku'";
-        }
-        if (!empty($category)) {
-            $updateParams[] = "category='$category'";
-        }
+        // Update the product in the database without changing the image paths
+        $updateQuery = "UPDATE products SET name='$productName', price='$productPrice', sku='$productSku', category='$category' WHERE id='$id'";
 
-        if (!empty($updateParams)) {
-            $updateQuery .= " " . implode(", ", $updateParams);
-            $updateQuery .= " WHERE id='$id'";
+        if ($conn->query($updateQuery)) {
+            echo "Product updated successfully.\n";
 
-            if ($conn->query($updateQuery)) {
-                echo "Product updated successfully.\n";
-
-                // Redirect back to the dashboard page after updating the product
-                // header("Location: dashboard.php");
-                exit();
-            } else {
-                echo "Failed to update product in the database: " . $conn->error;
-            }
+            // Redirect back to the dashboard page after updating the product
+            header("Location: dashboard.php");
+            exit();
         } else {
-            echo "No fields provided to update.\n";
+            echo "Failed to update product in the database: " . $conn->error;
         }
     }
 }
 
 // Close the database connection
 $conn->close();
-?>
