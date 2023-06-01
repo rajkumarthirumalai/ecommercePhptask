@@ -201,10 +201,14 @@ $breadcrumbHtml .= '</ol></nav>';
                         <td>
                             <div class="d-flex">
                                 <button class="btn btn-primary me-2" onclick="editProduct(<?php echo $id; ?>)">Edit</button>
+                                <button class="btn btn-primary me-2" onclick="ViewProduct(<?php echo $id; ?>)">View
+                                    Product</button>
+
                                 <form method="post" action="delete_product.php"
                                     onsubmit="return confirm('Are you sure you want to delete this product?');">
                                     <input type="hidden" name="id" value="<?php echo $id; ?>">
                                     <button type="submit" name="delete" class="btn btn-danger">Delete</button>
+
                                 </form>
                             </div>
                         </td>
@@ -342,6 +346,10 @@ $breadcrumbHtml .= '</ol></nav>';
                     modal.show();
                 });
         }
+        function ViewProduct(pid) {
+            window.location.href = "product-details.php?id=" + pid;
+        }
+
 
         function previewImage(event, previewId) {
             console.log("preview is called");
