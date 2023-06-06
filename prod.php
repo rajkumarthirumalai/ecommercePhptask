@@ -56,29 +56,20 @@ include("./db_config.php");
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'];
         $password = $_POST['password'];
-
-        echo "<script>console.log('Email:', '$email');</script>";
-        echo "<script>console.log('Password:', '$password');</script>";
-        $query = "SELECT id, password  FROM client WHERE email='$email'";
+        $query = "SELECT id FROM client WHERE email='$email'";
 
         $result = $conn->query($query);
 
         if ($result->num_rows > 0) {
-            // echo "this is client['password'] ",$client['password'],"and this is pass",$password;
-            // echo $password;
             $client = $result->fetch_assoc();
-            echo  $client;
-            var_dump($client);
             if (password_verify($password, $client['password'])) {
                 $_SESSION['client_id'] = $client['id'];
-                // exit();
+                exit();
             } else {
-                // echo "Invalid email or password. Please try again.";
-                // echo "password problem";
-
+                echo "Invalid email or password. Please try again.";
             }
         } else {
-            // echo "Invalid email or password. Please try again.";
+            echo "Invalid email or password. Please try again.";
         }
     }
     function escape($value)
@@ -148,18 +139,13 @@ include("./db_config.php");
                                         <p id="total-price">Total Price: $
                                             <?php echo $product['price']; ?>
                                         </p>
+                                        <button  class="add-to-cart-btn btn btn-primary" onclick="addToCart()">Add to cart</button>
                                         <script>
                                             function showAlert(mess) {
                                                 Swal.fire({ position: 'center', icon: 'success', title: '', text: mess, showConfirmButton: false, timer: 1500 });
                                             }
                                         </script>
-                                        <button onclick="addToCart(<?php echo $product['id'] ?>)"
-                                            class="add-to-cart-btn btn btn-primary">Add to cart</button>
-                                        <a href="view-cart.php?id=<?php echo $_SESSION['client_id']; ?>">
-                                            <button class="add-to-cart-btn btn btn-primary">
-                                                View Cart
-                                            </button>
-                                        </a>
+
                                     </div>
                                 </div>
                             </div>
@@ -222,49 +208,18 @@ include("./db_config.php");
         <script src="https://cdn.jsdelivr.net/npm/mdb-ui-kit@3.11.0/js/mdb.min.js"></script>
 
         <script>
-            function addToCart(pid) {
-                alert(pid, '<?php echo isset($_SESSION['client_id']) ?>');
-                if ('<?php echo isset($_SESSION['client_id']) ?>') {
-                    console.log("if part workss");
+            function addToCart() {
+                if (<?php echo isset($_SESSION['client_id']) ? 'true' : 'false'; ?>) {
                     // User is logged in, show success message
                     var quantityInput = document.getElementById('quantity');
                     var quantity = parseInt(quantityInput.value);
-                    var productId = pid;
+                    var productId = <?php echo $product['id']; ?>;
                     var userId = "<?php echo $_SESSION['client_id'] ?>";
                     var url = 'add_to_cart.php';
 
-                    // Create a form element
-                    var form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = url;
-
-                    // Create hidden input fields for the data
-                    var productIdInput = document.createElement('input');
-                    productIdInput.type = 'hidden';
-                    productIdInput.name = 'product_id';
-                    productIdInput.value = productId;
-
-                    var quantityInput = document.createElement('input');
-                    quantityInput.type = 'hidden';
-                    quantityInput.name = 'quantity';
-                    quantityInput.value = quantity;
-
-                    var userIdInput = document.createElement('input');
-                    userIdInput.type = 'hidden';
-                    userIdInput.name = 'client_id';
-                    userIdInput.value = userId;
-
-                    // Append the input fields to the form
-                    form.appendChild(productIdInput);
-                    form.appendChild(quantityInput);
-                    form.appendChild(userIdInput);
-
-                    // Append the form to the document and submit it
-                    document.body.appendChild(form);
-                    form.submit();
+                    // User is logged in, submit the form to add the product to the cart
+                    document.getElementById('add-to-cart-form').submit();
                 } else {
-                    console.log("else part workss");
-
                     // User is not logged in, redirect to the signup page with quantity parameter
                     var quantityInput = document.getElementById('quantity');
                     var quantity = parseInt(quantityInput.value);
@@ -274,6 +229,22 @@ include("./db_config.php");
                 }
             }
 
+            function addToCart() {
+                <?php if (!isset($_SESSION['client_id'])): ?>
+                    // User is not logged in, show login modal
+                    showLoginModal();
+                <?php else: ?>
+                    // // User is logged in, proceed with adding the product to the cart
+                    // var quantityInput = document.getElementById('quantity');
+                    // var quantity = parseInt(quantityInput.value);
+                    // var productId = <?php echo $product['id']; ?>;
+                    // var userId = "<?php echo $_SESSION['client_id'] ?>";
+                    // var url = 'add_to_cart.php';
+
+                    // // Submit the form to add the product to the cart
+                    // document.getElementById('add-to-cart-form').submit();
+                <?php endif; ?>
+            }
 
 
 
