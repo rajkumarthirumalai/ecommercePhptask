@@ -1,6 +1,7 @@
 <?php
 // Database connection details
 include("./db_config.php");
+// var_dump("client", $_SESSION['client_id']);
 ?>
 
 <!DOCTYPE html>
@@ -19,10 +20,6 @@ include("./db_config.php");
 
 
     <style>
-        body {
-            padding: 22px;
-            font-family: "Poppins";
-        }
 
         .add-to-cart-btn {
             font-family: "Poppins";
@@ -52,6 +49,7 @@ include("./db_config.php");
 
     <?php
     include("./db_config.php");
+    include 'client-header.php';
     session_start();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'];
@@ -71,14 +69,15 @@ include("./db_config.php");
             var_dump($client);
             if (password_verify($password, $client['password'])) {
                 $_SESSION['client_id'] = $client['id'];
-                // exit();
+                header("Location: view-user.php?id=" . $_SESSION['client_id']);
+                exit();
             } else {
-                // echo "Invalid email or password. Please try again.";
-                // echo "password problem";
+                echo "Invalid email or password. Please try again.";
+                echo "password problem";
 
             }
         } else {
-            // echo "Invalid email or password. Please try again.";
+            echo "Invalid email or password. Please try again.";
         }
     }
     function escape($value)
@@ -223,7 +222,6 @@ include("./db_config.php");
 
         <script>
             function addToCart(pid) {
-                alert(pid, '<?php echo isset($_SESSION['client_id']) ?>');
                 if ('<?php echo isset($_SESSION['client_id']) ?>') {
                     console.log("if part workss");
                     // User is logged in, show success message

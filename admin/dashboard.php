@@ -126,7 +126,7 @@ if (!isset($_SESSION['user_id'])) {
             </thead>
             <tbody>
                 <?php
-                include("./db_config.php");
+                include("../db_config.php");
 
                 // Function to escape user input for security
                 function escape($value)
@@ -181,8 +181,8 @@ if (!isset($_SESSION['user_id'])) {
                         <td>
                             <div class="d-flex">
                                 <button class="btn btn-primary me-2" onclick="editProduct(<?php echo $id; ?>)">Edit</button>
-                                <button class="btn btn-primary me-2" onclick="ViewProduct(<?php echo $id; ?>)">View
-                                    Product</button>
+                                <!-- <button class="btn btn-primary me-2" onclick="ViewProduct(<?php echo $id; ?>)">View
+                                    Product</button> -->
 
                                 <form method="post" action="delete_product.php"
                                     onsubmit="return confirm('Are you sure you want to delete this product?');">
