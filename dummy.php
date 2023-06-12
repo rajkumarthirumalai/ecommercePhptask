@@ -9,28 +9,33 @@ include("./db_config.php");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <style>
         body {
             background-color: beige;
         }
 
-        .slider {
-            max-width: 1300px;
-            margin: 0 auto;
-            height: 600px;
+        /* Styles for the first carousel */
+        #carouselExampleIndicators1 {
+            /* Add any custom styles if needed */
         }
 
-        .slider img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
+        /* Styles for the second carousel */
+        #carouselExampleControls2 {
+            /* Add any custom styles if needed */
+        }
+
+        /* Combined CSS styles from both carousels */
+        .carousel {
+            max-width: 1300px;
+            /* Adjust the width as desired */
+            margin: 0 auto;
         }
 
         .carousel-item {
             margin-top: 50px;
             height: 600px;
+            /* Adjust the height as desired */
             overflow: hidden;
         }
 
@@ -39,6 +44,18 @@ include("./db_config.php");
             height: 100%;
             object-fit: cover;
             transition: transform 0.3s;
+        }
+
+        .carousel-item.zoomed img {
+            transform: scale(1.2);
+            /* Adjust the scale factor as desired */
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            z-index: 9999;
         }
 
         .cards-wrapper {
@@ -67,6 +84,22 @@ include("./db_config.php");
         .carousel-inner {
             padding: 1em;
         }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            background-color: #e1e1e1;
+            width: 5vh;
+            height: 5vh;
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        @media (min-width: 768px) {
+            .card img {
+                height: 11em;
+            }
+        }
     </style>
     <title>Combined Carousels</title>
 </head>
@@ -75,42 +108,37 @@ include("./db_config.php");
     <?php include 'client-header.php'; ?>
 
     <!-- First Carousel -->
-    <div class="container">
-        <div class="slider">
-            <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <?php
-                    // Array of image URLs
-                    $images = [
-                        'images/6478a6c09876d.jpg',
-                        'images/6478a6c09876d.jpg',
-                        'images/6478a6c09876d.jpg'
-                    ];
+    <div id="carouselExampleIndicators1" class="carousel slide" data-ride="carousel">
 
-                    $active = true;
-                    foreach ($images as $image) {
-                        echo '<div class="carousel-item' . ($active ? ' active' : '') . '">';
-                        echo '<img src="' . $image . '" class="d-block w-100" alt="Slider Image">';
-                        echo '</div>';
-                        $active = false;
-                    }
-                    ?>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
-                    data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
-                    data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
+        <ol class="carousel-indicators">
+            <li data-target="#carouselExampleIndicators1" data-slide-to="0" class="active"></li>
+            <li data-target="#carouselExampleIndicators1" data-slide-to="1"></li>
+            <li data-target="#carouselExampleIndicators1" data-slide-to="2"></li>
+        </ol>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img class="d-block" src="./images/647764841ac6f.jpg" alt="First slide">
+            </div>
+            <div class="carousel-item">
+                <img class="d-block" src="./images/64789dbe0b092.jpg" alt="Second slide">
+            </div>
+            <div class="carousel-item">
+                <img class="d-block" src="./images/6478a6e0917d7.jpg" alt="Third slide">
             </div>
         </div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators1" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators1" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+
     </div>
+
     <!-- Second Carousel -->
-    <div id="carouselExampleControls2" class="carousel slide m-5" data-bs-ride="carousel">
+    <div id="carouselExampleControls2" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
             <?php
             // Fetch data from the database
@@ -141,7 +169,7 @@ include("./db_config.php");
                             $productSKU = $row['sku'];
                             $productImagePath = $row['image_path'];
                             ?>
-                            <div class="card">
+                            <div class="card" >
                                 <img src="<?php echo $productImagePath; ?>" class="card-img-top" alt="Product Image">
                                 <div class="card-body">
                                     <h5 class="card-title">
@@ -168,19 +196,29 @@ include("./db_config.php");
             }
             ?>
         </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls2"
-            data-bs-slide="prev">
+        <a class="carousel-control-prev" href="#carouselExampleControls2" role="button" data-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls2"
-            data-bs-slide="next">
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleControls2" role="button" data-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
+            <span class="sr-only">Next</span>
+        </a>
     </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // JavaScript code for the first carousel goes here
+            $('#carouselExampleIndicators1 .carousel-item').hover(function () {
+                $(this).addClass('zoomed');
+            }, function () {
+                $(this).removeClass('zoomed');
+            });
+            // JavaScript code for the second carousel goes here
+        });
+    </script>
 </body>
 
 </html>

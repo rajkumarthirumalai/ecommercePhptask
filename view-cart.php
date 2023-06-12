@@ -59,7 +59,7 @@ include("./db_config.php");
                         echo "<td>" . $row['name'] . "</td>";
                         echo "<td>" . $row['quantity'] . "</td>";
                         echo "<td>" . $row['price'] . "</td>";
-                        echo "<td>" . $row['total'] . "</td>";
+                        echo "<td>" .$row['quantity'] *$row['price'] . "</td>";
                         echo "<td><script>console.log('" . $row['created_at'] . "');
                               var dateString ='" . $row['created_at'] . "';
                               var unixTimestamp = Date.parse(dateString) / 1000;
@@ -74,7 +74,7 @@ include("./db_config.php");
                               </td>";
                         echo "</tr>";
 
-                        $totalSum += $row['total']; // Add the current item's total to the sum
+                        $totalSum += $row['quantity'] *$row['price']; // Add the current item's total to the sum
                     }
                     // Display the total sum in the table footer
                     echo "<tfoot>

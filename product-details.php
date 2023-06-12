@@ -69,7 +69,7 @@ include("./db_config.php");
             var_dump($client);
             if (password_verify($password, $client['password'])) {
                 $_SESSION['client_id'] = $client['id'];
-                header("Location: view-user.php?id=" . $_SESSION['client_id']);
+                header("Location: view-cart.php?id=" . $_SESSION['client_id']);
                 exit();
             } else {
                 echo "Invalid email or password. Please try again.";
