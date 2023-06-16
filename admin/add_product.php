@@ -27,8 +27,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if (in_array($imageFileType, $allowedTypes)) {
             // Define the upload directory and file paths
             $uploadDirectory = 'images/';
+
             $some = $uploadDirectory . uniqid();
+            $some2 = "./".$uploadDirectory . uniqid();
+
             $uploadFilePath =  $some. '.' . $imageFileType;
+            $uploadFilePath2 =  $some2. '.' . $imageFileType;
             $thumbnailDirectory = 'images/thumbnails/';
             $thumbnailFilePath = $some. '_thumbnail.' . $imageFileType;
 
@@ -39,6 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 // Create a thumbnail of the uploaded image
                 $thumbnail = imagecreatetruecolor(100, 100);
                 $source = imagecreatefromstring(file_get_contents($uploadFilePath));
+                $source2 = imagecreatefromstring(file_get_contents($uploadFilePath2));
+                imagecopyresampled($thumbnail, $source, 0, 0, 0, 0, 100, 100, imagesx($source), imagesy($source));
                 imagecopyresampled($thumbnail, $source, 0, 0, 0, 0, 100, 100, imagesx($source), imagesy($source));
 
                 // Save the thumbnail image
@@ -65,6 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 // Free up memory
                 imagedestroy($thumbnail);
                 imagedestroy($source);
+                imagedestroy($source2);
             } else {
                 echo "Failed to move the uploaded image file to the desired directory.\n";
             }

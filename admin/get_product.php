@@ -11,7 +11,7 @@ function escape($value)
 // Retrieve the product details based on the provided ID    
 if (isset($_GET['id'])) {
     $productId = $_GET['id'];
-    $selectQuery = "SELECT id, name, price, sku ,image_path FROM products WHERE id = '$productId'";
+    $selectQuery = "SELECT id, name, price, sku ,image_path,category FROM products WHERE id = '$productId'";
     $result = $conn->query($selectQuery);
 
     if ($result->num_rows > 0) {

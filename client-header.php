@@ -11,9 +11,16 @@
                     <!-- <a class="nav-link" href="client.php">view Cart</a> -->
                 </li>
                 <li class="nav-item">
-                    <form method="post" action="logout.php">
-                        <button type="submit" class="btn btn-warning mb-3">Logout</button>
-                    </form>
+                    <?php
+                    session_start();
+                    if (isset($_SESSION['client_id'])) {
+                        echo '<form method="post" action="logout.php">';
+                        echo '<button type="submit" class="btn btn-warning mb-3">Logout</button>';
+                        echo '</form>';
+                    } else {
+                        echo '<a class="btn btn-primary mb-3" href="client_index.php">Login</a>';
+                    }
+                    ?>
                 </li>
             </ul>
         </div>

@@ -14,7 +14,7 @@ if (isset($_POST['product_id'], $_POST['quantity'])) {
     
 
     // Insert the product into the cart table
-    $insertQuery = "INSERT INTO cart (product_id, quantity, total, client_id) VALUES ('$productId', '$quantity', '$total', '$clientId')";
+    $insertQuery = "INSERT INTO cart (product_id, quantity, client_id) VALUES ('$productId', '$quantity', '$clientId')";
     $conn->query($insertQuery);
 
     if ($conn->affected_rows > 0) {

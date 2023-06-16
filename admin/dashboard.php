@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['admin'])) {
     // Redirect to the dashboard
     header("Location: index.php");
     exit();
@@ -31,7 +31,8 @@ if (!isset($_SESSION['user_id'])) {
     <?php include 'header.php'; ?>
     <script type="module">
         import Treeselect from './dist/treeselectjs.mjs'
-
+        window.TreeIS = Treeselect
+        const tree = Treeselect
         const options = [
             {
                 name: 'Male',
@@ -78,24 +79,32 @@ if (!isset($_SESSION['user_id'])) {
             }
         ]
 
-        const className = '.treeselect-demo-default'
+
+        const className = '.treeselect-demo-default';
+
+        const className2 = '.treeselect-demo2-default'
+
 
         const runDefaultExample = (Treeselect) => {
             const domElement = document.querySelector(className);
-            const treeselect = new Treeselect({
+            window.treeselectInstance = new Treeselect({
                 parentHtmlContainer: domElement,
                 value: [],
                 options: options
             });
 
-            treeselect.srcElement.addEventListener('input', (e) => {
+            window.treeselectInstance.srcElement.addEventListener('input', (e) => {
                 const selectedValue = e.detail;
                 document.getElementById("selectedCategory").value = selectedValue;
-                console.log('default: Selected value ', selectedValue);
+
+                console.log('default:selected value', selectedValue);
             });
         };
 
-        runDefaultExample(Treeselect);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            runDefaultExample(Treeselect);
+        });
     </script>
 
 
@@ -119,7 +128,9 @@ if (!isset($_SESSION['user_id'])) {
                 <tr>
                     <th>Product ID</th>
                     <th>Name</th>
+                    <th>sku</th>
                     <th>price</th>
+                    <th>category</th>
                     <th>image</th>
                     <th>Options</th>
                 </tr>
@@ -140,7 +151,7 @@ if (!isset($_SESSION['user_id'])) {
                 {
                     global $conn;
 
-                    $selectQuery = "SELECT id, image_path, name, price, sku FROM products";
+                    $selectQuery = "SELECT id, image_path,category, name, price, sku FROM products";
                     if (!empty($sortCriteria)) {
                         $allowedCriteria = array("name", "price", "sku");
                         if (in_array($sortCriteria, $allowedCriteria)) {
@@ -151,7 +162,7 @@ if (!isset($_SESSION['user_id'])) {
                     $result = $conn->query($selectQuery);
                     return $result;
                 }
-
+                //
                 // Sort and retrieve the product details
                 $sortCriteria = isset($_GET['sort']) ? $_GET['sort'] : "";
                 $result = getProducts($sortCriteria);
@@ -163,6 +174,7 @@ if (!isset($_SESSION['user_id'])) {
                     $name = $row['name'];
                     $price = $row['price'];
                     $sku = $row['sku'];
+                    $cate = $row['category'];
                     ?>
                     <tr>
                         <td>
@@ -172,7 +184,32 @@ if (!isset($_SESSION['user_id'])) {
                             <?php echo $name; ?>
                         </td>
                         <td>
+                            <?php echo $sku; ?>
+                        </td>
+                        <td>
                             <?php echo $price; ?>
+                        </td>
+                        <td>
+                            <?php
+                            $categoryNames = array(
+                                1 => 'Male',
+                                2 => 'Top',
+                                3 => 'Tshirt',
+                                4 => 'Shirt',
+                                5 => 'Bottom',
+                                6 => 'Female',
+                                7 => 'Saree',
+                                8 => 'Chudi'
+                            );
+                            $categoryNumbers = array_map('intval', explode(',', str_replace('"', '', $cate)));
+
+                            foreach ($categoryNumbers as $value) {
+                                if (isset($categoryNames[$value])) {
+                                    echo $categoryNames[$value] . ',';
+                                }
+                            }
+
+                            ?>
                         </td>
                         <td>
                             <!-- <?php echo $image; ?> -->
@@ -180,7 +217,8 @@ if (!isset($_SESSION['user_id'])) {
                         </td>
                         <td>
                             <div class="d-flex">
-                                <button class="btn btn-primary me-2" onclick="editProduct(<?php echo $id; ?>)">Edit</button>
+                                <button class="btn btn-primary me-2"
+                                    onclick="editProduct(<?php echo $id; ?>,window.TreeIS)">Edit product</button>
                                 <!-- <button class="btn btn-primary me-2" onclick="ViewProduct(<?php echo $id; ?>)">View
                                     Product</button> -->
 
@@ -273,6 +311,12 @@ if (!isset($_SESSION['user_id'])) {
                                     required>
                             </div>
                             <div class="mb-3">
+                                <label for="productImage" class="form-label">category</label>
+                                <div class="section__select treeselect-demo2-default">
+                                    <input type="hidden" id="editselectedCategory2" name="editselectedCategory2">
+                                </div>
+                            </div>
+                            <div class="mb-3">
                                 <label for="editProductPrice" class="form-label">Price</label>
                                 <input type="number" step="0.01" class="form-control" id="editProductPrice"
                                     name="productPrice" required>
@@ -301,13 +345,15 @@ if (!isset($_SESSION['user_id'])) {
 
     </div>
 
+    <script src="./dist/treeselectjs.min.js"></script>
     <script>
 
         function sortProducts(select) {
             var sortCriteria = select.value;
             window.location.href = "dashboard.php?sort=" + sortCriteria;
         }
-        function editProduct(productId) {
+        function editProduct(productId, tree) {
+            console.log(tree);
             // Set the product ID value in the editProductModal form
             document.getElementById("editProductId").value = productId;
 
@@ -322,6 +368,72 @@ if (!isset($_SESSION['user_id'])) {
                     // Set the src attribute of editImagePreview to the image path
                     document.getElementById("editImagePreview").src = product.image_path;
                     document.getElementById("editImagePreview").style.display = "block";
+                    const className2 = '.treeselect-demo2-default'
+                    const options = [
+                        {
+                            name: 'Male',
+                            value: 1,
+                            children: [
+                                {
+                                    name: 'Top',
+                                    value: 2,
+                                    children: [
+                                        {
+                                            name: 'Tshirt',
+                                            value: 3,
+                                            children: []
+                                        },
+                                        {
+                                            name: 'shirt',
+                                            value: 4,
+                                            children: []
+                                        }
+                                    ]
+                                },
+                                {
+                                    name: 'Bottom',
+                                    value: 5,
+                                    children: []
+                                }
+                            ]
+                        },
+                        {
+                            name: 'Female',
+                            value: 6,
+                            children: [
+                                {
+                                    name: 'saree',
+                                    value: 7,
+                                    children: []
+                                },
+                                {
+                                    name: 'chudi',
+                                    value: 8,
+                                    children: []
+                                }
+                            ]
+                        }
+                    ]
+                    const runDefaultExample1 = (Treeselect, dummy) => {
+                        var categoryNumbers = dummy.replace(/"/g, '').split(',').map(Number);
+                        console.log("got it",categoryNumbers);
+                        const domElement2 = document.querySelector(className2);
+                        const treeselect2 = new Treeselect({
+                            parentHtmlContainer: domElement2,
+                            value: categoryNumbers,
+                            options: options
+                        });
+
+                        treeselect2.srcElement.addEventListener('input', (e) => {
+                            const selectedValue = e.detail;
+                            document.getElementById("editselectedCategory").value = "";
+
+                            document.getElementById("editselectedCategory").value = selectedValue;
+                            console.log('default:edit Selected value ', selectedValue);
+                        });
+                    };
+
+                    runDefaultExample1(tree, product.category);
 
                     // Show the edit product modal
                     var modal = new mdb.Modal(document.getElementById("editProductModal"));
@@ -357,6 +469,10 @@ if (!isset($_SESSION['user_id'])) {
 
 
 
+    </script>
+    <script type="module">
+
+        import Treeselect from './dist/treeselectjs.mjs'
     </script>
     <script src="./dist/treeselectjs.min.js"></script>
 </body>

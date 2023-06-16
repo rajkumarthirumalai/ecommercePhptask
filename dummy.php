@@ -14,17 +14,6 @@ include("./db_config.php");
         body {
             background-color: beige;
         }
-
-        /* Styles for the first carousel */
-        #carouselExampleIndicators1 {
-            /* Add any custom styles if needed */
-        }
-
-        /* Styles for the second carousel */
-        #carouselExampleControls2 {
-            /* Add any custom styles if needed */
-        }
-
         /* Combined CSS styles from both carousels */
         .carousel {
             max-width: 1300px;

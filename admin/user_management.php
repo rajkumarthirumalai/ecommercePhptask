@@ -2,7 +2,7 @@
 
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['admin'])) {
     // Redirect to the dashboard
     header("Location: index.php");
     exit(); 

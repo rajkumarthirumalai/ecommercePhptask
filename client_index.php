@@ -1,10 +1,11 @@
+
 <?php
 session_start();
 
 // Check if the user is already logged in
-    if (isset($_SESSION['admin'])) {
+    if (isset($_SESSION['client_id'])) {
         // Redirect to the dashboard
-        header("Location: dashboard.php");
+        header("Location: client.php");
         exit();
     }
 
@@ -29,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
     // Prepare and execute the SQL query to retrieve the user by email
-    $selectUserQuery = "SELECT id, email, password FROM users WHERE email = ?";
+    $selectUserQuery = "SELECT id, email, password FROM client WHERE email = ?";
     $stmt = $conn->prepare($selectUserQuery);
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -43,13 +44,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // Verify the password
         if (password_verify($password, $storedPassword)) {
             // Set the admin in the session
-            $_SESSION['admin'] = $row['email'];
+            $_SESSION['client_id'] = $row['id'];
 
             // Redirect to the dashboard
-            var_dump("it is stored",$_SESSION['admin']);
+            var_dump("it is stored",$_SESSION['client_id']);
 
-            header("Location: dashboard.php");
-            // exit();
+            header("Location: client.php");
+            exit();
         }
     }
 
@@ -65,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html>
 
 <head>
-    <title>Admin Login Page</title>
+    <title>client Login Page</title>
     <!-- Material Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdb-ui-kit@3.11.0/css/mdb.min.css">
     <style>
@@ -94,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <?php echo $error; ?>
                     </div>
                 <?php } ?>
-                <form action="index.php" method="POST">
+                <form action="client_index.php" method="POST">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" required>
